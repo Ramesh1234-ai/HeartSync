@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react'
-
+import { memo } from 'react'
 /**
  * SmartSearchBar - Advanced search with filters and smart suggestions
  */
 export default function SearchBar({ 
   search, 
   onSearchChange, 
-  showFilters,
   availableTags = []
 }) {
   const [showFilters, setShowFilters] = useState(false)
