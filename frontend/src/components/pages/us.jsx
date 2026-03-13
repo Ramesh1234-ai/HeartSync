@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/react";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 import {
   Brain,
   Database,
@@ -300,6 +299,14 @@ export default function AboutUs() {
             </Badge>
           </div>
           <div className="flex items-center gap-3">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="ghost" className="text-xs">Login</Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
             <Button variant="ghost" className="text-xs hidden sm:inline-flex">Demo</Button>
             <Button variant="ghost" className="text-xs hidden sm:inline-flex">Docs</Button>
             <Button variant="ghost" className="text-xs hidden sm:inline-flex">Blog</Button>
