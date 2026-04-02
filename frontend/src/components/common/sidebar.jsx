@@ -1,79 +1,122 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+"use client";
+import { useState } from "react";
+import {
+  Home,
+  Inbox,
+  Calendar,
+  Search,
+  Settings,
+  User,
+  LogOut,
+  PanelLeft,
+  History,
+} from "lucide-react";
+import { UserButton } from "@clerk/clerk-react";
 
-const Sidebar = ({ isCollapsed, setIsCollapsed, currentUser, onLogout }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [darkMode, setDarkMode] = useState(false);
-  const navItems = [
-    { icon: '📊', label: 'Dashboard', path: '/dashboard' },
-    { icon: '📈', label: 'Analytics', path: '/analytics' },
-    { icon: '⚙️', label: 'Settings', path: '/settings' },
-    { icon: '📤', label: 'Uploads', path: '/uploads' },
-  ];
+const items = [
+  { title: "Home", icon: Home },
+  { title: "Inbox", icon: Inbox, badge: 4 },
+  { title: "Calendar", icon: Calendar },
+  { title: "Search", icon: Search },
+  { title: "Settings", icon: Settings},
+];
+
+export default function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+  const [active, setActive] = useState("Home");
 
   return (
-    <>
-      {/* Sidebar Toggle Button */}
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className={`fixed top-5 ${isCollapsed ? 'left-3' : 'left-64'} z-[1001] w-9 h-9 bg-[white]/95 backdrop-blur-md border border-white/10 rounded-lg text-black flex items-center justify-center transition-all duration-300 hover:bg-[white] hover:border-white/20 hover:scale-105 active:scale-95 shadow-lg`}
-        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-      >
-        {isCollapsed ? '→' : '←'}
-      </button>
+    <aside
+      style={{
+        width: collapsed ? "64px" : "240px",
+        transition: "width 220ms cubic-bezier(0.4,0,0.2,1)",
+        fontFamily: "'DM Sans', 'Geist', sans-serif",
+      }}
+      className="relative flex flex-col h-screen bg-zinc-900 border-r border-zinc-800 overflow-hidden shrink-0"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-3 py-4 border-b border-zinc-800 mt-16">
+        {!collapsed && (
+          <span
+            className="text-white font-semibold text-sm tracking-wide truncate pl-1"
+            style={{ opacity: collapsed ? 0 : 1, transition: "opacity 180ms" }}
+          >
+            ZecoAI
+          </span>
+        )}
+        <button
+          onClick={() => setCollapsed((c) => !c)}
+          className="ml-auto p-1.5 rounded-md text-white/40 hover:text-white hover:bg-white/[0.08] transition-colors"
+          aria-label="Toggle sidebar"
+        >
+          <PanelLeft size={16} />
+        </button>
+      </div>
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 bottom-0 w-64 bg-[white]/98 backdrop-blur-xl border-r border-white/8 p-6 flex flex-col transition-transform duration-300 z-[1000] shadow-2xl overflow-y-auto ${isCollapsed ? '-translate-x-full' : 'translate-x-0'
-          }`}
-      >
-        {/* Brand */}
-        <div className="flex items-center gap-3 mb-8 pb-6 border-b border-white/8">
-          <div className="w-10 h-10 bg-linear-to-br from-emerald-400 to-cyan-400 rounded-xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20">
-            💰
-          </div>
-          <div className="flex flex-col">
-            <span className="text-black text-lg font-bold tracking-tight">Recent-chats</span>
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+        {!collapsed && (
+          <p className="text-[10px] font-medium text-white/30 uppercase tracking-widest px-2 pb-2 pt-1">
+            Navigation
+          </p>
+        )}
+
+        {items.map(({ title, icon: Icon, badge }) => {
+          const isActive = active === title;
+          return (
+            <button
+              key={title}
+              onClick={() => setActive(title)}
+              title={collapsed ? title : undefined}
+              className={`
+                group relative w-full flex items-center gap-3 px-2 py-2 rounded-lg text-sm
+                transition-all duration-150 outline-none
+                ${
+                  isActive
+                    ? "bg-indigo-500/15 text-indigo-300"
+                    : "text-white/50 hover:text-white/90 hover:bg-white/[0.06]"
+                }
+              `}
+            >
+              {/* Active indicator bar */}
+              {isActive && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-400 rounded-full" />
+              )}
+
+              <Icon
+                size={16}
+                className={`shrink-0 ${isActive ? "text-indigo-400" : ""}`}
+              />
+
+              {!collapsed && (
+                <span className="flex-1 text-left truncate">{title}</span>
+              )}
+
+              {!collapsed && badge && (
+                <span className="text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full">
+                  {badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Footer / User Avatar Section */}
+      <div className="border-t border-zinc-800 px-2 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10",
+                  userButtonPopoverCard: "dark"
+                }
+              }}
+            />
           </div>
         </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 flex flex-col gap-1">
-          {navItems.map((item, index) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <button
-                key={index}
-                onClick={() => navigate(item.path)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium text-sm relative w-full text-left ${isActive
-                  ? 'bg-emerald-500/12 text-emerald-400 font-semibold'
-                  : 'text-gray-400 hover:bg-white/6 hover:text-white hover:translate-x-0.5'
-                  }`}
-              >
-                {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-3/5 bg-emerald-400 rounded-r" />
-                )}
-                <span className="text-lg w-5 text-center">{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-
-          <div className="h-px bg-white/10 my-5" />
-        </nav>
-
-        {/* Footer */}
-        <div className="mt-auto pt-4 border-t border-white/8">
-          <div className="flex items-center justify-start mb-3 px-3 py-2 rounded-lg bg-white/3">
-            <span className="text-white text-sm font-medium">{currentUser}</span>
-          </div>
-          <button onClick={() => onLogout && onLogout()} className="w-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 hover:bg-indigo-500/25 hover:text-white hover:border-indigo-500/50 hover:-translate-y-0.5">
-            Logout
-          </button>
-        </div>
-      </aside >
-    </>
+      </div>
+    </aside>
   );
-};
-export default Sidebar;
+}

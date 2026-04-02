@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import {
   Brain,
   Database,
@@ -70,53 +72,53 @@ const TECH_STACK = [
     name: "MongoDB",
     role: "Database",
     icon: Database,
-    color: "text-green-400",
-    bg: "bg-green-400/10",
-    border: "border-green-400/20",
+    color: "text-white-400",
+    bg: "bg-black-400/10",
+    border: "border-grey-400/20",
     desc: "Flexible document storage for AI-generated content and user data at scale.",
   },
   {
     name: "Express.js",
     role: "Backend",
     icon: Server,
-    color: "text-yellow-400",
-    bg: "bg-yellow-400/10",
-    border: "border-yellow-400/20",
+    color: "text-white-400",
+    bg: "bg-black-400/10",
+    border: "border-grey-400/20",
     desc: "Fast, unopinionated REST API layer handling AI model orchestration.",
   },
   {
     name: "React.js",
     role: "Frontend",
     icon: Code2,
-    color: "text-cyan-400",
-    bg: "bg-cyan-400/10",
-    border: "border-cyan-400/20",
+    color: "text-white-400",
+    bg: "bg-black-400/10",
+    border: "border-grey",
     desc: "Component-driven UI delivering real-time AI interactions seamlessly.",
   },
   {
     name: "Node.js",
     role: "Runtime",
     icon: Terminal,
-    color: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    border: "border-emerald-400/20",
+    color: "text-black-400",
+    bg: "bg-white-400/10",
+    border: "border-grey",
     desc: "Event-driven runtime powering concurrent AI processing pipelines.",
   },
   {
     name: "AI / LLMs",
     role: "Intelligence",
     icon: Brain,
-    color: "text-purple-400",
-    bg: "bg-purple-400/10",
-    border: "border-purple-400/20",
+    color: "text-black-400",
+    bg: "bg-white-400/10",
+    border: "border-grey-400/20",
     desc: "Integrated large language models and ML inference for core features.",
   },
   {
     name: "REST / WS",
     role: "APIs",
     icon: Globe,
-    color: "text-blue-400",
-    bg: "bg-blue-400/10",
+    color: "text-black-400",
+    bg: "bg-white-400/10",
     border: "border-blue-400/20",
     desc: "RESTful endpoints and WebSocket streams for real-time AI responses.",
   },
@@ -180,41 +182,6 @@ const FEATURES = [
     accent: "group-hover:bg-green-400/10",
   },
 ];
-
-const TEAM = [
-  {
-    name: "Alex Rivera",
-    role: "Founder & Full-Stack Engineer",
-    avatar: "AR",
-    bio: "10+ years building scalable systems. Passionate about democratizing AI for developers worldwide.",
-    links: { github: "#", twitter: "#" },
-    gradient: "from-purple-500 to-blue-500",
-  },
-  {
-    name: "Sam Chen",
-    role: "AI/ML Engineer",
-    avatar: "SC",
-    bio: "Former research engineer at a top AI lab. Specializes in LLM fine-tuning and agent architectures.",
-    links: { github: "#", twitter: "#" },
-    gradient: "from-emerald-500 to-cyan-500",
-  },
-  {
-    name: "Jordan Kim",
-    role: "Frontend & UX Lead",
-    avatar: "JK",
-    bio: "Crafts interfaces that make complex AI feel approachable. Open-source contributor since 2016.",
-    links: { github: "#", twitter: "#" },
-    gradient: "from-orange-500 to-pink-500",
-  },
-];
-
-const STATS = [
-  { value: "50K+", label: "API Requests / Day" },
-  { value: "99.9%", label: "Uptime SLA" },
-  { value: "12ms", label: "Avg. Latency" },
-  { value: "200+", label: "GitHub Stars" },
-];
-
 // ── Animated counter ────────────────────────────────────────────────────────
 const useCounter = (end, duration = 1500, start = false) => {
   const [count, setCount] = useState(0);
@@ -238,6 +205,15 @@ const useCounter = (end, duration = 1500, start = false) => {
 export default function AboutUs() {
   const [statsVisible, setStatsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const navigate = useNavigate();
+  const { isSignedIn } = useUser();
+
+  // Redirect to dashboard on successful login
+  useEffect(() => {
+    if (isSignedIn) {
+      navigate("/dashboard");
+    }
+  }, [isSignedIn, navigate]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -248,7 +224,6 @@ export default function AboutUs() {
     if (el) observer.observe(el);
     return () => observer.disconnect();
   }, []);
-
   return (
     <div
       className="min-h-screen bg-white text-black"
@@ -449,7 +424,7 @@ export default function AboutUs() {
               onClick={() => setActiveTab(i)}
               className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border ${activeTab === i
                 ? `${tech.bg} ${tech.border} ${tech.color}`
-                : "border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600"
+                : "border-white-800 text-black-500 hover:text-black-300 hover:border-white-600"
                 }`}
             >
               {tech.name}
@@ -470,7 +445,7 @@ export default function AboutUs() {
                   {TECH_STACK[activeTab].role}
                 </Badge>
               </div>
-              <p className="text-zinc-400 text-sm">{TECH_STACK[activeTab].desc}</p>
+              <p className="text-white-400 text-sm">{TECH_STACK[activeTab].desc}</p>
             </div>
           </div>
         </Card>
@@ -574,7 +549,7 @@ export default function AboutUs() {
             <span className="display-font font-bold text-sm text-zinc-400">NexusAI</span>
           </div>
           <p className="text-zinc-600 text-xs">
-            MIT License · Built with ♥ by the Rishit
+            · Built with ♥ by the Rishit
           </p>
           <div className="flex gap-4">
             <a href="#" className="text-zinc-600 hover:text-zinc-400 text-xs transition-colors">Privacy</a>
